@@ -1,0 +1,14 @@
+{
+  "name": "demo-cicd-pages",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/smoke-test.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node --watch scripts/local-server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
