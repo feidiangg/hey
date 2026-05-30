@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import avatarImage from "./assets/avatar.jpg";
 
 const content = {
@@ -16,6 +16,43 @@ const content = {
     avatarKicker: "visual id",
     avatarTitle: "Creative operator",
     avatarCaption: "把平台、社区和技术表达画到同一张图上。",
+    runtimeTitle: "沸点 Runtime",
+    runtimeKicker: "execute intro_sequence",
+    runtimeCommand: "npx feidian run --target developer-ecosystem --mode live",
+    runtimeHeadline: "身份图谱已编译，生态引擎上线。",
+    runtimeSubline:
+      "沸点不是一个静态名片，而是一套把平台能力、开发者现场和 AI 技术生态串起来的运行系统。",
+    runtimeClose: "关闭",
+    runtimeReplay: "再跑一次",
+    runtimeStages: [
+      {
+        label: "Profile Kernel",
+        value: "沸点",
+        copy: "创作感、平台感和技术翻译能力进入核心态。"
+      },
+      {
+        label: "Platform Graph",
+        value: "API / Docs / Ops",
+        copy: "把复杂能力拆成开发者能进入、能复用、能反馈的路径。"
+      },
+      {
+        label: "Ecosystem Loop",
+        value: "Community x AI",
+        copy: "让内容、活动、伙伴和场景形成连续增长回路。"
+      }
+    ],
+    runtimeLogs: [
+      "> resolving identity.kernel",
+      "> linking developer touchpoints",
+      "> compiling AI ecosystem narrative",
+      "> binding platform metrics to adoption loop",
+      "> runtime ready: 沸点"
+    ],
+    runtimeMetrics: [
+      ["DX", "developer-first"],
+      ["AI", "capability-to-adoption"],
+      ["OPS", "feedback loop online"]
+    ],
     signal: "ONLINE",
     availability: "平台 / 社区 / AI 生态",
     heroStats: [
@@ -63,7 +100,7 @@ const content = {
     consoleTitle: "interactive terminal",
     consoleHint: "session synced with selected module",
     bootLines: [
-      "booting boiling-point.profile",
+      "booting feidian.profile",
       "loading developer-community context",
       "loading Baidu AI ecosystem experience",
       "ready"
@@ -80,17 +117,54 @@ const content = {
   en: {
     badge: "DEVELOPER ECOSYSTEM / AI PLATFORM",
     nav: ["Profile", "Systems", "Impact"],
-    name: "Boiling Point",
+    name: "FeiDIan",
     title: "I connect developers, AI ecosystems, and platform capabilities.",
     summary:
       "My work sits around developer communities, AI technology ecosystems, and platform operations. I care about turning complex capabilities into systems that developers can adopt, partners can build with, and teams can operate over time.",
     primaryAction: "Open Platform Map",
     secondaryAction: "Run Intro",
     languageLabel: "Lang",
-    avatarAlt: "Boiling Point profile illustration",
+    avatarAlt: "FeiDIan profile illustration",
     avatarKicker: "visual id",
     avatarTitle: "Creative operator",
     avatarCaption: "Mapping platforms, communities, and technical narratives into one picture.",
+    runtimeTitle: "FeiDIan Runtime",
+    runtimeKicker: "execute intro_sequence",
+    runtimeCommand: "npx feidian run --target developer-ecosystem --mode live",
+    runtimeHeadline: "Identity graph compiled. Ecosystem engine online.",
+    runtimeSubline:
+      "FeiDIan is not a static profile. It is an operating system for connecting platform capability, developer rooms, and AI ecosystems.",
+    runtimeClose: "Close",
+    runtimeReplay: "Run again",
+    runtimeStages: [
+      {
+        label: "Profile Kernel",
+        value: "FeiDIan",
+        copy: "Creative direction, platform sense, and technical translation enter kernel mode."
+      },
+      {
+        label: "Platform Graph",
+        value: "API / Docs / Ops",
+        copy: "Complex capabilities become paths developers can enter, reuse, and improve."
+      },
+      {
+        label: "Ecosystem Loop",
+        value: "Community x AI",
+        copy: "Content, events, partners, and scenarios form a continuous growth loop."
+      }
+    ],
+    runtimeLogs: [
+      "> resolving identity.kernel",
+      "> linking developer touchpoints",
+      "> compiling AI ecosystem narrative",
+      "> binding platform metrics to adoption loop",
+      "> runtime ready: FeiDIan"
+    ],
+    runtimeMetrics: [
+      ["DX", "developer-first"],
+      ["AI", "capability-to-adoption"],
+      ["OPS", "feedback loop online"]
+    ],
     signal: "ONLINE",
     availability: "Platform / Community / AI Ecosystem",
     heroStats: [
@@ -138,7 +212,7 @@ const content = {
     consoleTitle: "interactive terminal",
     consoleHint: "session synced with selected module",
     bootLines: [
-      "booting boiling-point.profile",
+      "booting feidian.profile",
       "loading developer-community context",
       "loading Baidu AI ecosystem experience",
       "ready"
@@ -158,6 +232,15 @@ function App() {
   const [language, setLanguage] = useState("zh");
   const [activeKey, setActiveKey] = useState("platform");
   const [pulse, setPulse] = useState(0);
+  const [introOpen, setIntroOpen] = useState(false);
+  const [introRun, setIntroRun] = useState(0);
+  const [streamedModules, setStreamedModules] = useState([]);
+  const [terminalRun, setTerminalRun] = useState({
+    id: 0,
+    key: "platform",
+    mode: "instant"
+  });
+  const [terminalChars, setTerminalChars] = useState(0);
 
   const t = content[language];
   const activeModule = useMemo(
@@ -172,11 +255,56 @@ function App() {
     `output: ${activeModule.title}`,
     "status: connected"
   ];
+  const terminalText = consoleLines.join("\n");
+  const isStreaming =
+    terminalRun.mode === "stream" && terminalRun.key === activeKey;
+  const visibleTerminalText = isStreaming
+    ? terminalText.slice(0, terminalChars)
+    : terminalText;
+  const visibleConsoleLines = visibleTerminalText.split("\n");
+
+  useEffect(() => {
+    if (!isStreaming) {
+      setTerminalChars(terminalText.length);
+      return undefined;
+    }
+
+    let nextCount = 0;
+    setTerminalChars(0);
+    const timer = window.setInterval(() => {
+      nextCount = Math.min(terminalText.length, nextCount + 3);
+      setTerminalChars(nextCount);
+
+      if (nextCount >= terminalText.length) {
+        window.clearInterval(timer);
+      }
+    }, 18);
+
+    return () => window.clearInterval(timer);
+  }, [isStreaming, terminalRun.id, terminalText]);
+
+  function selectModule(key) {
+    const shouldStream = !streamedModules.includes(key);
+
+    setActiveKey(key);
+    setTerminalRun({
+      id: Date.now(),
+      key,
+      mode: shouldStream ? "stream" : "instant"
+    });
+
+    if (shouldStream) {
+      setStreamedModules((current) =>
+        current.includes(key) ? current : [...current, key]
+      );
+    }
+  }
 
   function runIntro() {
-    const next = t.modules[(pulse + 1) % t.modules.length];
-    setActiveKey(next.key);
+    setIntroOpen(true);
+    selectModule("ai");
     setPulse((current) => current + 1);
+    setIntroRun((current) => current + 1);
   }
 
   return (
@@ -185,7 +313,7 @@ function App() {
         <div className="hero-bg" aria-hidden="true" />
         <header className="topbar">
           <a className="brand" href="#profile" aria-label={t.name}>
-            <span className="brand-mark">bp</span>
+            <span className="brand-mark">fd</span>
             <span>{t.name}</span>
           </a>
           <nav aria-label="Primary navigation">
@@ -270,7 +398,7 @@ function App() {
                 className={module.key === activeKey ? "module-card active" : "module-card"}
                 key={module.key}
                 type="button"
-                onClick={() => setActiveKey(module.key)}
+                onClick={() => selectModule(module.key)}
               >
                 <span>{module.label}</span>
                 <strong>{module.title}</strong>
@@ -288,9 +416,19 @@ function App() {
                 <i />
               </div>
             </div>
-            <pre key={`${activeKey}-${language}-${pulse}`}>
-              {consoleLines.map((line) => (
-                <code key={line}>{line}</code>
+            <pre
+              className={isStreaming ? "streaming" : "settled"}
+              key={`${activeKey}-${language}-${terminalRun.id}-${pulse}`}
+            >
+              {visibleConsoleLines.map((line, index) => (
+                <code key={`${index}-${line}`}>
+                  {line}
+                  {isStreaming &&
+                    index === visibleConsoleLines.length - 1 &&
+                    terminalChars < terminalText.length && (
+                      <span className="stream-cursor" />
+                    )}
+                </code>
               ))}
             </pre>
             <p>{t.consoleHint}</p>
@@ -327,6 +465,76 @@ function App() {
           </div>
         </div>
       </section>
+      {introOpen && (
+        <section
+          className="run-overlay"
+          key={`${language}-${introRun}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.runtimeTitle}
+        >
+          <div className="run-backdrop" aria-hidden="true" />
+          <div className="run-board">
+            <div className="run-topline">
+              <span>{t.runtimeKicker}</span>
+              <button type="button" onClick={() => setIntroOpen(false)}>
+                {t.runtimeClose}
+              </button>
+            </div>
+            <div className="run-command">
+              <span>$</span>
+              <code>{t.runtimeCommand}</code>
+            </div>
+            <div className="run-grid">
+              <div className="runtime-core" aria-hidden="true">
+                <div className="runtime-ring ring-one" />
+                <div className="runtime-ring ring-two" />
+                <div className="runtime-avatar">
+                  <img src={avatarImage} alt="" />
+                </div>
+                <span className="runtime-node node-platform">platform</span>
+                <span className="runtime-node node-community">community</span>
+                <span className="runtime-node node-ai">ai</span>
+              </div>
+
+              <div className="runtime-copy">
+                <p>{t.runtimeTitle}</p>
+                <h2>{t.runtimeHeadline}</h2>
+                <span>{t.runtimeSubline}</span>
+                <div className="runtime-metrics">
+                  {t.runtimeMetrics.map(([label, value]) => (
+                    <div key={label}>
+                      <strong>{label}</strong>
+                      <span>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="runtime-stages">
+                {t.runtimeStages.map((stage) => (
+                  <article key={stage.label}>
+                    <span>{stage.label}</span>
+                    <strong>{stage.value}</strong>
+                    <p>{stage.copy}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div className="runtime-console">
+                {t.runtimeLogs.map((line) => (
+                  <code key={line}>{line}</code>
+                ))}
+              </div>
+            </div>
+            <div className="run-actions">
+              <button type="button" onClick={runIntro}>
+                {t.runtimeReplay}
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

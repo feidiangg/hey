@@ -19,7 +19,7 @@ const app = await readFile("src/App.jsx", "utf8");
 const styles = await readFile("src/styles.css", "utf8");
 const viteConfig = await readFile("vite.config.js", "utf8");
 
-if (!app.includes("沸点") || !app.includes("Boiling Point")) {
+if (!app.includes("沸点") || !app.includes("FeiDIan")) {
   throw new Error("App should include bilingual identity content");
 }
 
